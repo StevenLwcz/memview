@@ -27,10 +27,22 @@ Memory view at the address of the expression"""
             return
 
         if len(arguments) == 0:
-            print("memview expression")
+            print("memview: expression")
             return
 
-        self.win.set_display(arguments)
+        try:
+            expr = gdb.parse_and_eval(arguments)
+        except gdb.Error:
+            print("memview: can't evaluate {arguments}")
+            return
+
+        if expr.address == None:
+            addr = expr
+        else:
+            addr = expr.address
+
+        self.win.set_title(arguments)
+        self.win.set_display(addr)
 
 memViewCmd = MemViewCmd()
 
@@ -39,7 +51,11 @@ class MemViewWindow(object):
     def __init__(self, tui):
         self.tui = tui
         self.tui.title = "Memory View"
-        self.buff = ""
+        self.buff = "Nothing to display"
+        self.addr = 0
+
+    def set_title(self, args):
+        self.tui.title = args
 
     def render(self):
         if not self.tui.is_valid():
@@ -47,17 +63,10 @@ class MemViewWindow(object):
 
         self.tui.write(self.buff, True)
 
-    def set_display(self, args):
-        self.tui.title = args
-
-        expr = gdb.parse_and_eval(args)
-        if expr.address == None:
-            addr = expr
-        else:
-            addr = expr.address
-
-        n = self.tui.height * 8
+    def set_display(self, addr):
+        self.addr = addr
         infe = gdb.selected_inferior()
+        n = self.tui.height * 8
         mv = infe.read_memory(addr, n)
 
         self.buff = ""
@@ -75,10 +84,11 @@ class MemViewWindow(object):
         pass
 
     def vscroll(self, num):
+        addr = self.addr + num * 8
+        self.set_display(addr)
         pass
 
     def click(self, x, y, button):
-        print(x, y, button)
         pass
  
 # Factory Method
