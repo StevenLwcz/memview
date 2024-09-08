@@ -64,11 +64,14 @@ class MemViewWindow(object):
         self.tui.write(self.buff, True)
 
     def set_display(self, addr):
-        self.addr = addr
         infe = gdb.selected_inferior()
         n = self.tui.height * 8
-        mv = infe.read_memory(addr, n)
+        try:
+            mv = infe.read_memory(addr, n)
+        except gdb.MemoryError:
+            return
 
+        self.addr = addr
         self.buff = ""
         for i in range(0, n, 8):
             m = mv[i:i + 8]
