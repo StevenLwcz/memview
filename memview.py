@@ -1,7 +1,11 @@
 NL = "\n"
 
 GREEN = "\x1b[38;5;47m"
+BLUE  = "\x1b[38;5;14m"
+WHITE = "\x1b[38;5;15m"
+YELLOW = "\x1b[38;5;226m"
 RESET = "\x1b[0m"
+
 
 import re
 pattern = re.compile(r'[\x00-\x1f\x7f-\x9f]')
@@ -60,7 +64,7 @@ class MemViewWindow(object):
         for i in range(0, n, 8):
             m = mv[i:i + 8]
             text = pattern.sub('.', m.tobytes().decode('latin-1'))
-            self.buff+=f"{hex(addr + i)}: {m.hex(' ')} {text}\n"
+            self.buff+=f"{GREEN}{hex(addr + i)}: {BLUE}{m.hex(' ')}{RESET} {text}\n"
 
         self.render()
 
