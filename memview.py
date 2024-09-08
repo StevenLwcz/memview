@@ -18,6 +18,10 @@ Memory view at the address of the expression"""
         self.win = win
 
     def invoke(self, arguments, from_tty):
+        if self.win == None: 
+            print("memview: run 'layout memview' to set up Tui mode")
+            return
+
         if len(arguments) == 0:
             print("memview expression")
             return
