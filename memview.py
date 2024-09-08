@@ -41,6 +41,13 @@ Memory view at the address of the expression"""
         else:
             addr = expr.address
 
+        n = self.win.tui.height * 8
+        try:
+            mv = gdb.selected_inferior().read_memory(addr, n)
+        except gdb.MemoryError:
+            print(f"memview: can't read memory at {addr}")
+            return
+
         self.win.set_title(arguments)
         self.win.set_display(addr)
 
@@ -64,10 +71,9 @@ class MemViewWindow(object):
         self.tui.write(self.buff, True)
 
     def set_display(self, addr):
-        infe = gdb.selected_inferior()
         n = self.tui.height * 8
         try:
-            mv = infe.read_memory(addr, n)
+            mv = gdb.selected_inferior().read_memory(addr, n)
         except gdb.MemoryError:
             return
 
